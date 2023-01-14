@@ -41,23 +41,37 @@ void rotate(int li[9], int times){
 
 int actgp[9]; // the current coordinate of the active game piece in the game window. 
 int actgpu [9]; // the current coordination of the active game piece not in the game window coordinate.
-bool gpset {1}; // whether the game piece is setted at the bottom;
+int gpset {1}; // whether the game piece is setted at the bottom;
+std::vector<int> draUv;
 
 
 void randt(){
 	int s1 = ((ctime()%100)*7)%4;
 	int s2 = ((ctime()%1000)%8);
-	std::cout<<s1<<' '<<s2<<std::endl;
 	rotate(stet.squ, s2);
 	rotate(stet.L, s2);
 	rotate(stet.line, s2);
 	rotate(stet.t, s2);
 	switch (s1%4){
-		case 0: for (int i=0; i!=9; ++i) actgpu[i]=stet.squ[i]; break;
-		case 1: for (int i=0; i!=9; ++i) actgpu[i]=stet.L[i]; break;
-		case 2: for (int i=0; i!=9; ++i) actgpu[i]=stet.line[i]; break;
-		case 3: for (int i=0; i!=9; ++i) actgpu[i]=stet.t[i]; break;
-	}	
+		case 0: for (int i=0; i!=9; ++i) ::actgpu[i]=stet.squ[i]; break;
+		case 1: for (int i=0; i!=9; ++i) ::actgpu[i]=stet.L[i]; break;
+		case 2: for (int i=0; i!=9; ++i) ::actgpu[i]=stet.line[i]; break;
+		case 3: for (int i=0; i!=9; ++i) ::actgpu[i]=stet.t[i]; break;
+	}
+
+	::actgp[4]=::actgpu[8];
+	for (int i=0; i!=3; ++i){
+		::actgp[i] = ::actgpu[i];
+	}
+	::actgp[3] = ::actgpu[7]; ::actgp[5]=::actgpu[3]; ::actgp[6]=::actgpu[6]; ::actgp[7]=::actgpu[5]; ::actgp[8]=::actgpu[4];
+
+	for (int i=0; i<3; ++i){
+		for (int j=0; j<3; ++j){
+			if (::actgp[i*3+j]!=0){
+				::actgp[i*3+j] = ::actgp[i*3+j]*(wdt*i+j)+acp[0]+acp[1]*wdt;
+			}
+		}
+	}
 }
 
 
@@ -69,33 +83,21 @@ char toC(int i){ // int --> char:
 	} return '?';
 }
 
+
 void draU (){ //drawing buffer update
 	for (int i=0; i<wdt*het; ++i){
 		if (dra[i]=1) dra[i]=0;
 	}
-	if (gpset){
+	if (::gpset){
 		randt();
-		::actgp[4]=::actgpu[8];
-		for (int i=0; i!=3; ++i){
-			::actgp[i] = ::actgpu[i];
-		}
-		::actgp[3] = ::actgpu[7]; ::actgp[5]=::actgpu[3]; ::actgp[6]=::actgpu[6]; ::actgp[7]=::actgpu[5]; ::actgp[8]=::actgpu[4];
-		gpset = 0;
-	}
-	std::vector<int> draUv;
-	for (int i=0; i<3; ++i){
-		for (int j=0; j<3; ++j){
-			if (::actgp[i*3+j]!=0){
-				::actgp[i*3+j] = (::actgp)[i*3+j]*(wdt*i+j)+acp[0]+acp[1]*wdt;
+		for (int i=0; i<3; ++i){
+			for (int j=0; j<3; ++j){
+				if (::actgp[i*3+j]!=0){
+					draUv.push_back(::actgp[i*3+j]); 
+				}
 			}
 		}
-	}
-	for (int i=0; i<3; ++i){
-		for (int j=0; j<3; ++j){
-			if (::actgp[i*3+j]!=0){
-				draUv.push_back(::actgp[i*3+j]); 
-			}
-		}
+		::gpset = 0;
 	}
 	for (int  element:draUv){
 		if (dra[element]==0){
@@ -105,11 +107,10 @@ void draU (){ //drawing buffer update
 }
 
 void fun(){
-	draU();
-	int i = 0;
 	for (int i=0; i!=10;++i){
 		std::cout<<"\n";
 	}
+	draU();
 	for (int i=0; i!=het+2; ++i){
 		for (int j=0; j!=wdt+2; ++j){
 			if (i==0||i==het+1||j==0||j==wdt+1){
