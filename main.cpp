@@ -248,7 +248,7 @@ void fun(){
 
 bool delay(){
 	::end = ctime();
-	if ((::end-::start)>100){ // 100 milliseconds
+	if ((::end-::start)>150){ // 100 milliseconds
 		::start = ::end;
 		return true;
 	}
