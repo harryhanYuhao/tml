@@ -3,9 +3,16 @@
 #include<ctime>
 #include<chrono>
 #include<vector>
+#include"conio.h"
 
 #define wdt 40
 #define het 30
+
+#define keya 97
+#define keyd 100 
+#define keys 115
+#define keye 101
+#define keyx 120
 
 void pa9(int* a){
 	for (int i=0; i<9; ++i) std::cout<<a[i]<<' ';
@@ -25,6 +32,7 @@ bool gs = 1;
 long start, end; // for time 
 int dra[wdt*het]; // drawing buffer.
 int acp [2] = {wdt/2, 0}; // Active object position, (wdt, het)
+long keytimes, keytimee; //key timer start, key timer ends
 
 struct Tet{
 	int squ[9] {0, 1, 1, 1, 0, 0, 0, 0, 1}; // Square
@@ -70,7 +78,7 @@ void randt(){
 	for (int i=0; i<3; ++i){
 		for (int j=0; j<3; ++j){
 			if (::actgp[i*3+j]!=0){
-				::actgp[i*3+j] = ::actgp[i*3+j]*(wdt*i+j)+acp[0]+acp[1]*wdt;
+				::actgp[i*3+j] = ::actgp[i*3+j]*(wdt*i+j)+wdt/2;
 			}
 		}
 	}
@@ -102,25 +110,95 @@ void draU (){ //drawing buffer update
 		}
 		::gpset = 0;
 	} else{
+		int rcounter = 0; //row counter
+		for (int i=0; i<het; ++i){
+			bool det = true;
+			for (int j=0; j<wdt; ++j){
+				if (dra[wdt*i+j]!=2){
+					det = 0;
+					break;
+				}
+
+			}
+		}
 		for (int &element:draUv){ //move down
 			element+=wdt;
+			acp[1] += 1;
 		}
 		for (int element:draUv){
-			if (element/wdt==het-1){
+			if (element/wdt==het-1){ //bottom detect
+				acp [0] = wdt/2; acp [1] = 0;
 				::gpset = 1;
 				for (int  element:draUv){
 					dra[element] = 2;
 				}
 			}
-			if (dra[element+wdt] == 2){
+			if ((dra[element+wdt] == 2)||(dra[element+1]==2)||(dra[element-1]==2)){ // collision detect
 				::gpset = 1;
 				for (int  element:draUv){
 					dra[element] = 2;
 				}
+				acp [0] = wdt/2; acp [1] = 0;
 			}
-			if ((dra[element+wdt] == 2)&&(element/wdt)<5){
+			if ((dra[element+wdt] == 2)&&(element/wdt)<5){ //endgame detect
 				gs = 0;
 			}
+		}
+		keytimes = ctime();
+		keytimee = ctime();
+		while ((keytimee - keytimes)<2){
+			if(kbhit()){
+				int keyval = getch();
+				if(keyval == keya){
+					for(int& element:draUv){ // move left
+						--element;
+					}
+					break;
+				}
+				if(keyval == keyd){ // move right
+					for(int& element:draUv){
+						++element;
+					}
+					break;
+				}
+				if(keyval == keys){ //TODO better s algorithm
+					for(int& element:draUv){
+						if ((dra[element+wdt]==2)||(dra[element+2*wdt]==2)){
+							break;
+						}
+						element+=wdt;
+						std::cout<<"s pressed!\n";
+					}
+					break;
+				}
+				if (keyval == keye){
+					rotate(actgpu, 1);
+					::actgp[4]=::actgpu[8];
+					for (int i=0; i!=3; ++i){
+						::actgp[i] = ::actgpu[i];
+					}
+					::actgp[3] = ::actgpu[7]; ::actgp[5]=::actgpu[3]; ::actgp[6]=::actgpu[6]; ::actgp[7]=::actgpu[5]; ::actgp[8]=::actgpu[4];
+				
+					for (int i=0; i<3; ++i){
+						for (int j=0; j<3; ++j){
+							if (::actgp[i*3+j]!=0){
+								::actgp[i*3+j] = ::actgp[i*3+j]*(wdt*i+j)+acp[0]+acp[1]*wdt/2;
+							}
+						}
+					}
+					draUv.clear();
+					for (int i=0; i<3; ++i){
+						for (int j=0; j<3; ++j){
+							if (::actgp[i*3+j]!=0){
+								draUv.push_back(::actgp[i*3+j]); 
+							}
+						}
+					}
+				}
+				break;
+			}
+	//		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+			keytimee = ctime();
 		}
 	}
 	
@@ -152,7 +230,7 @@ void fun(){
 
 bool delay(){
 	::end = ctime();
-	if ((::end-::start)>10){ // 100 milliseconds
+	if ((::end-::start)>100){ // 100 milliseconds
 		::start = ::end;
 		return true;
 	}
@@ -177,7 +255,7 @@ int main (){
 			std::cout<<"game over!\n";
 			break;
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}
 	return 0;
 }
