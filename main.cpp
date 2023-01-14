@@ -86,7 +86,7 @@ char toC(int i){ // int --> char:
 
 void draU (){ //drawing buffer update
 	for (int i=0; i<wdt*het; ++i){
-		if (dra[i]=1) dra[i]=0;
+		if (dra[i]==1) dra[i]=0;
 	}
 	if (::gpset){
 		randt();
@@ -103,7 +103,7 @@ void draU (){ //drawing buffer update
 			element+=wdt;
 		}
 		for (int element:draUv){
-			if (element/wdt==het){
+			if (element/wdt==het-1){
 				::gpset = 1;
 				for (int  element:draUv){
 					dra[element] = 2;
@@ -121,9 +121,6 @@ void draU (){ //drawing buffer update
 }
 
 void fun(){
-	for (int i=0; i<200; ++i){
-		dra[i]=2;
-	}
 	for (int i=0; i!=10;++i){
 		std::cout<<"\n";
 	}
@@ -144,7 +141,7 @@ void fun(){
 
 bool delay(){
 	::end = ctime();
-	if ((::end-::start)>100){
+	if ((::end-::start)>50){ // 100 milliseconds
 		::start = ::end;
 		return true;
 	}
