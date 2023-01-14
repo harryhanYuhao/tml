@@ -77,9 +77,9 @@ void randt(){
 
 char toC(int i){ // int --> char: 
 	switch (i){
-		case 0: return ' '; // empty
-		case 1: return '*'; // temporarily occupied
-		case 2: return '*'; // permanently occupied 
+		case 0: return ' '; break; // empty
+		case 1: return '*'; break; // temporarily occupied
+		case 2: return '*'; break; // permanently occupied 
 	} return '?';
 }
 
@@ -98,7 +98,21 @@ void draU (){ //drawing buffer update
 			}
 		}
 		::gpset = 0;
+	} else{
+		for (int &element:draUv){
+			element+=wdt;
+		}
+		for (int element:draUv){
+			if (element/wdt==het){
+				::gpset = 1;
+				for (int  element:draUv){
+					dra[element] = 2;
+				}
+				draUv.clear();
+			}
+		}
 	}
+	
 	for (int  element:draUv){
 		if (dra[element]==0){
 			dra[element] = 1;
@@ -107,6 +121,9 @@ void draU (){ //drawing buffer update
 }
 
 void fun(){
+	for (int i=0; i<200; ++i){
+		dra[i]=2;
+	}
 	for (int i=0; i!=10;++i){
 		std::cout<<"\n";
 	}
@@ -143,7 +160,7 @@ int main (){
 	while(1){
 		if (delay()){ //update every 100 milliseconds;
 			fun();
-			pa9(actgp);
+		//	pa9(actgp);
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
