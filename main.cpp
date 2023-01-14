@@ -110,6 +110,13 @@ void draU (){ //drawing buffer update
 				}
 				draUv.clear();
 			}
+			if (dra[element+wdt] == 2){
+				::gpset = 1;
+				for (int  element:draUv){
+					dra[element] = 2;
+				}
+				draUv.clear();
+			}
 		}
 	}
 	
