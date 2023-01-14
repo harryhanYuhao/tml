@@ -10,6 +10,7 @@
 void pa9(int* a){
 	for (int i=0; i<9; ++i) std::cout<<a[i]<<' ';
 }
+
 long ctime(){
 	auto now = std::chrono::system_clock::now();
 	auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
@@ -20,9 +21,10 @@ long ctime(){
 }
 
 int counter = 0;
+bool gs = 1;
 long start, end; // for time 
 int dra[wdt*het]; // drawing buffer.
-int acp [2] = {wdt/2, 4}; // Active object position, (wdt, het)
+int acp [2] = {wdt/2, 0}; // Active object position, (wdt, het)
 
 struct Tet{
 	int squ[9] {0, 1, 1, 1, 0, 0, 0, 0, 1}; // Square
@@ -90,6 +92,7 @@ void draU (){ //drawing buffer update
 	}
 	if (::gpset){
 		randt();
+		draUv.clear();
 		for (int i=0; i<3; ++i){
 			for (int j=0; j<3; ++j){
 				if (::actgp[i*3+j]!=0){
@@ -99,7 +102,7 @@ void draU (){ //drawing buffer update
 		}
 		::gpset = 0;
 	} else{
-		for (int &element:draUv){
+		for (int &element:draUv){ //move down
 			element+=wdt;
 		}
 		for (int element:draUv){
@@ -108,14 +111,15 @@ void draU (){ //drawing buffer update
 				for (int  element:draUv){
 					dra[element] = 2;
 				}
-				draUv.clear();
 			}
 			if (dra[element+wdt] == 2){
 				::gpset = 1;
 				for (int  element:draUv){
 					dra[element] = 2;
 				}
-				draUv.clear();
+			}
+			if ((dra[element+wdt] == 2)&&(element/wdt)<5){
+				gs = 0;
 			}
 		}
 	}
@@ -148,7 +152,7 @@ void fun(){
 
 bool delay(){
 	::end = ctime();
-	if ((::end-::start)>50){ // 100 milliseconds
+	if ((::end-::start)>10){ // 100 milliseconds
 		::start = ::end;
 		return true;
 	}
@@ -156,6 +160,9 @@ bool delay(){
 }
 
 void init(){
+	for(int i=0; i<sizeof(dra)/sizeof(int);++i){
+		dra[i] = 0;
+	}
 }
 
 int main (){
@@ -165,6 +172,10 @@ int main (){
 		if (delay()){ //update every 100 milliseconds;
 			fun();
 		//	pa9(actgp);
+		}
+		if (!gs){
+			std::cout<<"game over!\n";
+			break;
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
