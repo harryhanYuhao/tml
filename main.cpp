@@ -5,7 +5,7 @@
 #include<vector>
 #include"conio.h"
 
-#define wdt 40
+#define wdt 6
 #define het 30
 
 #define keya 97
@@ -68,6 +68,7 @@ void randt(){
 		case 2: for (int i=0; i!=9; ++i) ::actgpu[i]=stet.line[i]; break;
 		case 3: for (int i=0; i!=9; ++i) ::actgpu[i]=stet.t[i]; break;
 	}
+//	for (int i=0; i!=9; ++i) ::actgpu[i]=stet.squ[i];
 
 	::actgp[4]=::actgpu[8];
 	for (int i=0; i!=3; ++i){
@@ -111,15 +112,26 @@ void draU (){ //drawing buffer update
 		::gpset = 0;
 	} else{
 		int rcounter = 0; //row counter
+		bool det = true;
 		for (int i=0; i<het; ++i){
-			bool det = true;
+			det = true;
 			for (int j=0; j<wdt; ++j){
 				if (dra[wdt*i+j]!=2){
 					det = 0;
 					break;
 				}
-
 			}
+			if (det){
+				break;
+			}
+			++rcounter;
+		}
+		++rcounter;
+		if (det){
+			std::vector<int> temp;
+			for(int i=0; i<wdt; ++i) temp.push_back(0);
+			for (int i=0; i<wdt*(rcounter-1); ++i) temp.push_back(dra[i]);
+			for (int i=0; i<wdt*rcounter; ++i) dra[i] = temp[i];
 		}
 		for (int &element:draUv){ //move down
 			element+=wdt;
@@ -133,7 +145,7 @@ void draU (){ //drawing buffer update
 					dra[element] = 2;
 				}
 			}
-			if ((dra[element+wdt] == 2)||(dra[element+1]==2)||(dra[element-1]==2)){ // collision detect
+			if (dra[element+wdt] == 2){ // collision detect
 				::gpset = 1;
 				for (int  element:draUv){
 					dra[element] = 2;
@@ -173,6 +185,12 @@ void draU (){ //drawing buffer update
 				}
 				if (keyval == keye){
 					rotate(actgpu, 1);
+					acp[1] -=6;
+					int temp;
+					for (int element: draUv) temp+= element;
+					temp/=draUv.size();
+					//acp[1]=temp/wdt;
+					//acp[0]=temp%wdt;
 					::actgp[4]=::actgpu[8];
 					for (int i=0; i!=3; ++i){
 						::actgp[i] = ::actgpu[i];
