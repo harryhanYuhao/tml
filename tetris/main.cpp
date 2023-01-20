@@ -5,7 +5,7 @@
 #include<vector>
 #include"conio.h"
 
-#define wdt 6
+#define wdt 8
 #define het 30
 
 #define keya 97
@@ -93,7 +93,6 @@ char toC(int i){ // int --> char:
 		case 2: return '*'; break; // permanently occupied 
 	} return '?';
 }
-
 
 void draU (){ //drawing buffer update
 	for (int i=0; i<wdt*het; ++i){
