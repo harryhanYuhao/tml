@@ -2,24 +2,27 @@
 // 1. Make it more readable and maintainable
 // 2. resolving bugs for rotation by introducing algorithm with vector and matrices.
 // 3. Multithreading keyboard listenners.
-// 4. Add new features in game: scores, difficulty, etc.
+// 4. Add new features in game: scores, difficulty, down keys to make it move faster, space to make it drop immediately.
 #include<iostream>
 #include<thread>
 #include<ctime>
 #include<chrono>
 #include<vector>
 #include"conio.h"
+#include<stdlib.h>
 
-#define wdt 6
-#define het 30
+#define WDT 10
+#define HET 25
 
-#define keya 97
-#define keyd 100 
-#define keys 115
-#define keye 101
-#define keyx 120
+#define KEYA 97
+#define KEYD 100 
+#define KEYS 115
+#define KEYE 101
+#define KEYX 120
 
 long start, end;
+int screenbuffer [WDT*HET] {0}; // width times height.
+int score;
 
 void rotation(){
 	double x, y, tx, ty;
@@ -47,24 +50,61 @@ void ctime(long *res){ // Get Current Time
 	*res = duration;
 }
 
-void fun(){
-	static int counter {0};
-	std::cout<<counter++<<std::endl;
+char bufferToChar(int a){
+	switch (a){
+		case 0 : return ' ';
+		case 1 : return '*';
+		case 2 : return '*';
+	}
+	return '?';
+}
+
+void screen(){ //Update Screen according to the buffer.
+	// static int counter {0};
+	
+	// std::cout<<counter++<<" "<<rand()%100+1<<std::endl;
+	while(1){
+		ctime(&(::end)); // In milliseconds
+		if ((::end-::start)>=10){ //100 fps
+			for (int i=0; i<100; i++) std::cout<<std::endl; // Updating the screen. 
+
+			std::cout<<"fps: "<<1000/(::end-::start)<<std::endl; // FPS
+			std::cout<<"SCORE: "<<::score<<std::endl; // FPS
+
+			for(int i=0; i<WDT+2; ++i){ // Printing the margin
+				std::cout<<"#";
+			}
+			std::cout<<std::endl;
+
+			for (int i=0; i<HET; ++i){
+				std::cout<<"#"; //Printing the left margin
+				for(int j=0; j<WDT; ++j){
+					std::cout<<bufferToChar(::screenbuffer[j+i*WDT]);
+				}
+				std::cout<<"#"<<std::endl; //printing the right margin
+			}
+
+			for(int i=0; i<WDT+2; ++i){ //printing the bottom margin
+				std::cout<<"#";
+			}
+			std::cout<<std::endl;
+
+			::start=::end; // For time
+		}
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
+	}
 }
 
 void init(){
+	srand(time(NULL));
 	ctime(&(::start));	
 	return;
 }
 
 int main(){
 	init();
-	while(1){
-		ctime(&(::end));
-		if ((::end-::start)>100){
-			fun();
-			::start=::end;
-		}
-		std::this_thread::sleep_for(std::chrono::microseconds(1));
-	}
+	std::thread t1(screen);
+	
+	t1.join();
+	return 0;
 }
