@@ -3,13 +3,14 @@
 // 2. resolving bugs for rotation by introducing algorithm with vector and matrices.
 // 3. Multithreading keyboard listenners.
 // 4. Add new features in game: scores, difficulty, down keys to make it move faster, space to make it drop immediately.
-#include<iostream>
-#include<thread>
-#include<ctime>
-#include<chrono>
-#include<vector>
-#include"conio.h"
-#include<stdlib.h>
+#include <iostream>
+#include <thread>
+#include <ctime>
+#include <chrono>
+#include <vector>
+#include "conio.h"
+#include <stdlib.h>
+#include <mutex>
 
 #define WDT 10
 #define HET 25
@@ -20,9 +21,13 @@
 #define KEYE 101
 #define KEYX 120
 
-long start, end;
+long start, end; // Time tracker for screen buffer
+long gstart, gend; // Time tracker for game loop
 int screenbuffer [WDT*HET] {0}; // width times height.
 int score;
+int keypressed {0}; // For thread communication
+
+std::mutex mtx;
 
 void rotation(){
 	double x, y, tx, ty;
@@ -55,8 +60,43 @@ char bufferToChar(int a){
 		case 0 : return ' ';
 		case 1 : return '*';
 		case 2 : return '*';
+		case KEYA: return 'a';
+		default: return '?';
 	}
 	return '?';
+}
+
+void keylistener(){ // The keylistener: on its own thread.
+
+	while (1){
+		int key = getch();
+		if ((key == KEYA)||(key==KEYE)||(key==KEYS)||(key==KEYD)){	
+			mtx.lock();
+			keypressed = key;
+			mtx.unlock();
+		}
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
+	}
+	return;
+}
+
+void gameloop() { // The game loop that modifies the screen buffer Updating at different time, in a different thread.
+	int * ap = screenbuffer;
+	ctime(&(::gend));
+	while (1){
+		if((::gend-::gstart)>=10){
+			if (keypressed!=0){
+				char charbuffer = keypressed;
+				*(ap++)=charbuffer;
+				mtx.lock();
+				keypressed=0;
+				mtx.unlock();
+			}
+			std::this_thread::sleep_for(std::chrono::microseconds(1));
+			::gstart=::gend;
+		}
+	}
+	return;
 }
 
 void screen(){ //Update Screen according to the buffer.
@@ -68,8 +108,8 @@ void screen(){ //Update Screen according to the buffer.
 		if ((::end-::start)>=10){ //100 fps
 			for (int i=0; i<100; i++) std::cout<<std::endl; // Updating the screen. 
 
-			std::cout<<"fps: "<<1000/(::end-::start)<<std::endl; // FPS
-			std::cout<<"SCORE: "<<::score<<std::endl; // FPS
+			std::cout<<"fps: "<<1000/(::end-::start)<<std::endl; // print the fps 
+			std::cout<<"SCORE: "<<::score<<std::endl; // print the score
 
 			for(int i=0; i<WDT+2; ++i){ // Printing the margin
 				std::cout<<"#";
@@ -93,17 +133,21 @@ void screen(){ //Update Screen according to the buffer.
 		}
 		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}
+	return;
 }
 
 void init(){
 	srand(time(NULL));
 	ctime(&(::start));	
+	ctime(&(::gstart));
 	return;
 }
 
 int main(){
 	init();
 	std::thread t1(screen);
+	std::thread t2(gameloop);
+	std::thread t3(keylistener);
 	
 	t1.join();
 	return 0;
