@@ -174,7 +174,7 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 			
 			//Bottom Detection
 			for (int i:gamepieceCor){
-				if(((i+WDT)>250)||(screenbuffer[i+WDT]==2)){
+				if(((i+WDT)>=WDT*HET)||(screenbuffer[i+WDT]==2)){
 					newPiece = 1;
 					break;
 				}
@@ -225,6 +225,7 @@ void screen(){ //Update Screen according to the buffer.
 	// static int counter {0};
 	
 	// std::cout<<counter++<<" "<<rand()%100+1<<std::endl;
+	int counter {0};
 	while(1){
 		if (!gameState){ 
 			std::cout<<"Game Finished! \n Your Score is: "<<score<<std::endl;
@@ -232,7 +233,8 @@ void screen(){ //Update Screen according to the buffer.
 			return;
 		}
 		ctime(&(::end)); // In milliseconds
-		if ((::end-::start)>=20){ //50 fps
+		if ((::end-::start)>=25){ //50 fps
+			if(counter>20) system("clear");
 			// for (int i:gamepieceCor) std::cout<<i<<std::endl;
 			for (int i=0; i<50; i++) std::cout<<std::endl; // Updating the screen. TODO: uncomment it
 
