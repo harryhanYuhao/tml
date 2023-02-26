@@ -1,7 +1,7 @@
 // Refactor tml code:
 // 1. Make it more readable and maintainable
-// 2. resolving bugs for rotation by introducing algorithm with vector and matrices.
-// 3. Multithreading keyboard listenners.
+// 2. resolving bugs for rotation: DONE
+// 3. Multithreading keyboard listenners: DONE
 // 4. Add new features in game: scores, difficulty, down keys to make it move faster, space to make it drop immediately.
 #include <iostream>
 #include <thread>
@@ -27,23 +27,34 @@ int screenbuffer [WDT*HET] {0}; // width times height.
 int score;
 int keypressed {0}; // For thread communication
 
+int speed {200}; // Game speed
+
+int cor [5] {WDT/2, 5}; // The x, y coordinates of the tetris. from upper left corner clockwise (0, 0) (3, 0) (3, 3) (0, 3)
+
+// We need 6 basic shapes for the tetris.
+int LTetris [16] {0,0,0,0,0,1,0,0,0,1,1,1,0,0,0,0};
+int LineTetris [16] {0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0};
+int SquareTetris [16] {0,0,0,0,0,1,1,0,0,1,1,0,0,0,0,0};
+int ForkTetris [16] {0,0,1,0,0,1,1,1,0,0,0,0,0,0,0,0};
+int ChiralTetris1 [16] {0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,0};
+int ChiralTetris2 [16] {0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0};
+
+int activePiece [16]; 
+
 std::mutex mtx;
 
-void rotation(){
-	double x, y, tx, ty;
-	for (int i=0; i<16; ++i){
-		tx=(i%4)-1.5;
-		ty=(int)((i-tx)/4)-1.5;
-		// std::cout<<ty<<std::endl;
-		// std::cout<<tx<<" "<<ty<<std::endl;
-		x = -ty+1.5; y=tx+1.5;
-		printf("%d:%f, %f, %d\n",i, x,y,int(4*y+x));
-		// printf("%ld, %ld\n", x,y);
+void rotation(int * inArray){ //Rotation
+	int * ptr = (int*)calloc(16, sizeof(int));
+	for(int i=0; i<16; ++i){	
+		ptr[i] = inArray[i];
 	}
-}
-
-void pa9(int* a){
-	for (int i=0; i<9; ++i) std::cout<<a[i]<<' ';
+	for(int i=0; i<4; ++i){
+		for(int j=0; j<4; ++j){
+			inArray[3-i+4*j]=ptr[j+i*4];
+		}
+	}
+	free(ptr);
+	return;
 }
 
 void ctime(long *res){ // Get Current Time
@@ -51,8 +62,7 @@ void ctime(long *res){ // Get Current Time
 	auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
 	auto epoch = now_ms.time_since_epoch();
 	auto value = std::chrono::duration_cast<std::chrono::milliseconds>(epoch);
-	long duration = value.count();
-	*res = duration;
+	*res = value.count();
 }
 
 char bufferToChar(int a){
@@ -60,7 +70,6 @@ char bufferToChar(int a){
 		case 0 : return ' ';
 		case 1 : return '*';
 		case 2 : return '*';
-		case KEYA: return 'a';
 		default: return '?';
 	}
 	return '?';
@@ -82,19 +91,30 @@ void keylistener(){ // The keylistener: on its own thread.
 
 void gameloop() { // The game loop that modifies the screen buffer Updating at different time, in a different thread.
 	int * ap = screenbuffer;
-	ctime(&(::gend));
 	while (1){
-		if((::gend-::gstart)>=10){
+	ctime(&(::gend));
+		if((::gend-::gstart)>=speed){ // modify here for change of game speed.
 			if (keypressed!=0){
-				char charbuffer = keypressed;
-				*(ap++)=charbuffer;
+				switch(keypressed){
+					case KEYE: rotation(activePiece); break;
+					case KEYA: cor[0]--;
+					case KEYD: cor[0]++;
+					// case KEYS: 
+				}
 				mtx.lock();
 				keypressed=0;
 				mtx.unlock();
 			}
-			std::this_thread::sleep_for(std::chrono::microseconds(1));
+
+			for(int i=0; i<4; ++i){
+				for(int j=0; j<4; ++j){
+					screenbuffer[(cor[1]+i)*WDT+cor[0]+j]=activePiece[j+4*i];
+				}
+			}
+
 			::gstart=::gend;
 		}
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	}
 	return;
 }
@@ -105,7 +125,7 @@ void screen(){ //Update Screen according to the buffer.
 	// std::cout<<counter++<<" "<<rand()%100+1<<std::endl;
 	while(1){
 		ctime(&(::end)); // In milliseconds
-		if ((::end-::start)>=10){ //100 fps
+		if ((::end-::start)>=20){ //50 fps
 			for (int i=0; i<100; i++) std::cout<<std::endl; // Updating the screen. 
 
 			std::cout<<"fps: "<<1000/(::end-::start)<<std::endl; // print the fps 
@@ -140,6 +160,9 @@ void init(){
 	srand(time(NULL));
 	ctime(&(::start));	
 	ctime(&(::gstart));
+	for(int i=0; i<16; ++i){
+		activePiece[i]=LineTetris[i];
+	}
 	return;
 }
 
@@ -150,5 +173,7 @@ int main(){
 	std::thread t3(keylistener);
 	
 	t1.join();
+	t2.detach();
+	t3.detach();
 	return 0;
 }
