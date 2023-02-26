@@ -234,11 +234,15 @@ void screen(){ //Update Screen according to the buffer.
 		}
 		ctime(&(::end)); // In milliseconds
 		if ((::end-::start)>=25){ //50 fps
-			if(counter>20) system("clear");
+			if(counter>20) {
+				system("clear");
+				counter = 0;
+			}
 			// for (int i:gamepieceCor) std::cout<<i<<std::endl;
 			for (int i=0; i<50; i++) std::cout<<std::endl; // Updating the screen. TODO: uncomment it
 
 			std::cout<<"e for rotation, a for left, b for right, s for down\n";
+			std::cout<<"speed: "<<400/speed<<std::endl;
 			std::cout<<"fps: "<<1000/(::end-::start)<<std::endl; // print the fps 
 			std::cout<<"SCORE: "<<::score<<std::endl; // print the score
 
