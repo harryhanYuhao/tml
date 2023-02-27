@@ -120,9 +120,9 @@ void randomActiveGamePiece(){ //Modify activePiece to be one of the random consi
 	for (int i=0; i<16; ++i){
 		activePiece[i]=allList[(random%7)*16+i];
 	}
-	for (int i=0; i<16; ++i){
-		activePiece[i]=LineTetris[i];
-	}
+	// for (int i=0; i<16; ++i){
+	// 	activePiece[i]=LineTetris[i];
+	// }
 	updateGamePieceCor();	
 	return;
 }
