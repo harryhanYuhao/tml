@@ -120,9 +120,9 @@ void randomActiveGamePiece(){ //Modify activePiece to be one of the random consi
 	for (int i=0; i<16; ++i){
 		activePiece[i]=allList[(random%7)*16+i];
 	}
-	// for (int i=0; i<16; ++i){
-	// 	activePiece[i]=LineTetris[i];
-	// }
+	for (int i=0; i<16; ++i){
+		activePiece[i]=LineTetris[i];
+	}
 	updateGamePieceCor();	
 	return;
 }
@@ -131,7 +131,7 @@ void randomActiveGamePiece(){ //Modify activePiece to be one of the random consi
 void keylistener(){ // The keylistener: on its own thread.
 	while (1){
 		int key = getch();
-		if ((key == KEYA)||(key==KEYE)||(key==KEYS)||(key==KEYD)){	
+		if (key!=0){
 			mtx.lock();
 			keypressed = key;
 			mtx.unlock();
@@ -148,7 +148,7 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 		ctime(&(::gend));
 		if(!gameState) return;
 		if ((score-30)>0){
-			speedNormal=(1900/score)+1000/(score-30)+600/(score-20)+400/(score-10)+80;
+			speedNormal=(2000/score)+1200/(score-10)+600/(score-20)+400/(score-30)+100;
 		}
 		if((::gend-::gstart)>=speed/5){ // modify here for change of game speed.
 			if (sCounter==0){speed = speedNormal;} // Press s will set the counter to 5.
@@ -167,11 +167,12 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 			updateGamePieceCor();
 
 			if (keypressed!=0){ //Key Detecting
-				switch(keypressed){
+				switch(keypressed){ 
 					case KEYE: rotation(activePiece); break;
 					case KEYA: cor[0]--; break;
 					case KEYD: cor[0]++; break;
 					case KEYS: sCounter = 10; break;
+					case KEYX: for(int i=0; i<sizeof(gamepieceCor)/sizeof(int); ++i) gamepieceCor[i]=expectedPieceCor[i]; break;
 				}
 				mtx.lock();
 				keypressed=0;
@@ -187,18 +188,18 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 			}
 
 			// Expected Piece Detection
-			for (int i=0; i<(sizeof(gamepieceCor)/sizeof(int)); ++i){
+			for (int i=0; i<4; ++i){
 				expectedPieceCor[i]=gamepieceCor[i];
 			}
 			for (int i=0; i<HET; ++i){
 				for (int j:expectedPieceCor){
-					if(((j+WDT)>=WDT*HET)||(screenbuffer[i+WDT]==2)){
-						break;
+					if(((j+WDT)>=WDT*HET)||(screenbuffer[j+WDT]==2)){
+						goto jump;
 					}
 				}
 				for(int &j:expectedPieceCor) j+=WDT;
 			}
-			
+			jump:
 			
 			//End Game Detection 
 			for (int i=0; i<WDT*HET; ++i){
@@ -276,6 +277,7 @@ void screen(){ //Update Screen according to the buffer.
 				std::cout<<"#"; //Printing the left margin
 				for(int j=0; j<WDT; ++j){
 					std::cout<<bufferToChar(::screenbuffer[j+i*WDT]);
+					// std::cout<<::screenbuffer[j+i*WDT];
 				}
 				std::cout<<"#"<<std::endl; //printing the right margin
 			}
@@ -285,6 +287,8 @@ void screen(){ //Update Screen according to the buffer.
 				// std::cout<<ANSI_COLOR_GREYBOX<<" "<<ANSI_COLOR_RESET;
 			}
 			std::cout<<std::endl;
+			// std::cout<<"expectedPieceCor: \n";
+			// for (int i:expectedPieceCor) std::cout<<i<<" \n";
 
 			::start=::end; // For time
 		}
