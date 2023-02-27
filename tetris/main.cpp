@@ -28,6 +28,7 @@
 #define ANSI_COLOR_BLUE    "\x1b[34m"
 #define ANSI_COLOR_MAGENTA "\x1b[35m"
 #define ANSI_COLOR_CYAN    "\x1b[36m"
+#define ANSI_COLOR_GREYBOX "\x1b[100m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
 long start, end; // Time tracker for screen buffer
@@ -55,6 +56,7 @@ int ChiralTetris2 [16] {0,0,0,0,1,1,0,0,0,1,1,0,0,0,0,0};
 int activePiece [16]; // 4*4 array holding the structures of the tetris.
 
 int gamepieceCor [4] {0}; // The coordinate of the tetris In game coordinate 
+int expectedPieceCor [4] {0};
 
 bool gameState {1};
 bool newPiece {0};
@@ -84,14 +86,15 @@ void ctime(long *res){ // Get Current Time
 	*res = value.count();
 }
 
-char bufferToChar(int a){
+std::string bufferToChar(int a){
 	switch (a){
-		case 0 : return ' ';
-		case 1 : return '*';
-		case 2 : return '*';
-		default: return '?';
+		case 0 : return " ";
+		case 1 : return "*";
+		case 2 : return "*"ANSI_COLOR_RESET;
+		case 3 : return ANSI_COLOR_GREYBOX"*"ANSI_COLOR_RESET;
+		default: return "?";
 	}
-	return '?';
+	return "?";
 }
 
 void updateGamePieceCor(){
@@ -148,7 +151,7 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 			speedNormal=(1900/score)+1000/(score-30)+600/(score-20)+400/(score-10)+80;
 		}
 		if((::gend-::gstart)>=speed/5){ // modify here for change of game speed.
-			if (sCounter==0){speed = speedNormal;}
+			if (sCounter==0){speed = speedNormal;} // Press s will set the counter to 5.
 			else{speed = speekFast; sCounter--;}
 
 			if (newPiece){
@@ -158,8 +161,11 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 				cor[0]=WDT/2; cor[1] = 1;
 				newPiece = 0;
 				randomActiveGamePiece();
+				score+=2;
 			}
+
 			updateGamePieceCor();
+
 			if (keypressed!=0){ //Key Detecting
 				switch(keypressed){
 					case KEYE: rotation(activePiece); break;
@@ -174,11 +180,25 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 			
 			//Bottom Detection
 			for (int i:gamepieceCor){
-				if(((i+WDT)>=WDT*HET)||(screenbuffer[i+WDT]==2)){
+				if(((i+WDT)>=WDT*HET)||(screenbuffer[i+WDT]==2)){ // The same condition is used for expectedPieceCor.
 					newPiece = 1;
 					break;
 				}
 			}
+
+			// Expected Piece Detection
+			for (int i=0; i<(sizeof(gamepieceCor)/sizeof(int)); ++i){
+				expectedPieceCor[i]=gamepieceCor[i];
+			}
+			for (int i=0; i<HET; ++i){
+				for (int j:expectedPieceCor){
+					if(((j+WDT)>=WDT*HET)||(screenbuffer[i+WDT]==2)){
+						break;
+					}
+				}
+				for(int &j:expectedPieceCor) j+=WDT;
+			}
+			
 			
 			//End Game Detection 
 			for (int i=0; i<WDT*HET; ++i){
@@ -207,10 +227,11 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 
 			//Clear and draw to the Screen buffer 
 			for (int i=0; i<WDT*HET; ++i){
-				if(screenbuffer[i]==1) screenbuffer[i]=0;
+				if(screenbuffer[i]==1||screenbuffer[i]==3) screenbuffer[i]=0;
 			}
 
 			for (int i:gamepieceCor) screenbuffer[i]=1;
+			for (int i:expectedPieceCor) screenbuffer[i]=3;
 		}
 		if((::gend-::gstart>=speed)){
 			cor[1]++;
@@ -261,6 +282,7 @@ void screen(){ //Update Screen according to the buffer.
 
 			for(int i=0; i<WDT+2; ++i){ //printing the bottom margin
 				std::cout<<"#";
+				// std::cout<<ANSI_COLOR_GREYBOX<<" "<<ANSI_COLOR_RESET;
 			}
 			std::cout<<std::endl;
 
