@@ -60,6 +60,7 @@ int expectedPieceCor [4] {0};
 
 bool gameState {1};
 bool newPiece {0};
+bool refresh {1};
 
 
 std::mutex mtx;
@@ -136,7 +137,7 @@ void keylistener(){ // The keylistener: on its own thread.
 			keypressed = key;
 			mtx.unlock();
 		}
-		std::this_thread::sleep_for(std::chrono::microseconds(1));
+		std::this_thread::sleep_for(std::chrono::microseconds(2));
 		if (!gameState) return;
 	}
 	return;
@@ -167,6 +168,9 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 			updateGamePieceCor();
 
 			if (keypressed!=0){ //Key Detecting
+				mtx.lock();
+				refresh=1;
+				mtx.unlock();
 				switch(keypressed){ 
 					case KEYE: rotation(activePiece); break;
 					case KEYA: cor[0]--; break;
@@ -236,9 +240,12 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 		}
 		if((::gend-::gstart>=speed)){
 			cor[1]++;
+			mtx.lock();
+			refresh = 1;
+			mtx.unlock();
 			::gstart=::gend;
 		}
-		std::this_thread::sleep_for(std::chrono::microseconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 	return;
 }
@@ -255,7 +262,11 @@ void screen(){ //Update Screen according to the buffer.
 			return;
 		}
 		ctime(&(::end)); // In milliseconds
-		if ((::end-::start)>=25){ //50 fps
+		// TODO keylistener too slow
+		if ((refresh&&(::end-::start)>20)||((::end-::start)>=500)){ //maxium 50 fps
+			mtx.lock();
+			refresh=0;
+			mtx.unlock();
 			if(counter>20) {
 				system("clear");
 				counter = 0;
@@ -292,7 +303,7 @@ void screen(){ //Update Screen according to the buffer.
 
 			::start=::end; // For time
 		}
-		std::this_thread::sleep_for(std::chrono::microseconds(1));
+		std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
 	}
 	return;
 }
