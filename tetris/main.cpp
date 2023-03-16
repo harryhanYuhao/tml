@@ -254,11 +254,7 @@ void screen(){ //Update Screen according to the buffer.
 		}
 		ctime(&(::end)); // In milliseconds
 		if ((::end-::start)>=25){ //50 fps
-			counter++;
-			if(counter>10) {
-				puts("\033c");
-				counter = 0;
-			}
+			puts("\033c");
 			// for (int i:gamepieceCor) std::cout<<i<<std::endl;
 			for (int i=0; i<50; i++) std::cout<<std::endl; // Updating the screen. TODO: uncomment it
 
