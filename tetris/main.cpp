@@ -244,10 +244,8 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 }
 
 void screen(){ //Update Screen according to the buffer.
-	// static int counter {0};
+	static int counter {0};
 	
-	// std::cout<<counter++<<" "<<rand()%100+1<<std::endl;
-	int counter {0};
 	while(1){
 		if (!gameState){ 
 			std::cout<<"Game Finished! \n Your Score is: "<<score<<std::endl;
@@ -256,8 +254,9 @@ void screen(){ //Update Screen according to the buffer.
 		}
 		ctime(&(::end)); // In milliseconds
 		if ((::end-::start)>=25){ //50 fps
-			if(counter>20) {
-				system("clear");
+			counter++;
+			if(counter>10) {
+				puts("\033c");
 				counter = 0;
 			}
 			// for (int i:gamepieceCor) std::cout<<i<<std::endl;
