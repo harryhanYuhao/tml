@@ -7,15 +7,16 @@
 
 
 void toRoman(int arabic){
+	if (arabic>3999) {
+		printf("%s\n", "The biggest Roman Numeral is 3999, with representation MMMCMXCIX");
+		return;
+	}
 	char res [50] = "";
 	int tens = 10, digit=1;
 	while (arabic/tens!=0){
 		digit++; tens*=10;
 	}
 	for (int i = digit; i > 0; i--){
-		arabic=arabic%((int)pow(10, i-1));
-		printf("%d\n", arabic);
-		printf("%s\n", res);
 		if (i==4){	
 			int temp = arabic/1000;
 			for (int i = 0; i < temp; i++){
@@ -23,60 +24,58 @@ void toRoman(int arabic){
 			}
 		}
 		else{
-			char d1[1], d2[1], d3[1];
+			char d1[2], d2[2], d3[2];
+			d1[1]='\0'; d2[1]='\0'; d3[1]='\0';
 			if (i==3){
-				d1 [0] = 'C', d2 [0]= 'D', d3 [0] = 'M';
+				d1 [0] = 'C'; d2 [0]= 'D'; d3 [0] = 'M';
 			}
 			if (i==2){
-				d1 [0]= 'X', d2[0] = 'L', d3[0] = 'C';
+				d1 [0]= 'X'; d2[0] = 'L'; d3[0] = 'C';
 			}
 			if (i==1){
-				d1[0] = 'I', d2[0] = 'V', d3[0] = 'X';
+				d1[0] = 'I'; d2[0] = 'V'; d3[0] = 'X';
 			}
 			int temp = arabic/pow(10, i-1);
-			if (temp==0) continue;
+			if (temp==0) goto next;
 			if (temp <=3) {
-				for (int i = 0; i < temp; i++){ strcat(res, d1);}
-				continue;
+				for (int j = 0; j < temp; j++){
+					strcat(res, d1);
+				}
+				goto next;
 			}
 			if (temp == 4) {
-				strcat(res, d1); strcat(res, d2); continue;
+				strcat(res, d1); strcat(res, d2); 
+				goto next;
 			}
 			if (temp <=8){
 				strcat(res, d2);
-				for (int i = 0; i < temp-5; i++) strcat(res, d1);
-				continue;
+				for (int j = 0; j < temp-5; j++) strcat(res, d1);
+				goto next;
 			}
 			if (temp==9) {
 				strcat(res, d1); strcat(res, d3);
-				continue;
+				goto next;
 			}
 		}
+		next:
+		arabic=arabic%((int)pow(10, i-1));
 	}	
 	printf("%s\n", res);
 }
 
 int main() {//int argc, char *argv[]
-	toRoman(1);
-	printf("%lf\n", pow(10,2));
-	// char buf[20];
-	// 
-	// printf("%s", "Enter Roman Numerals or Arabic Numbers!\n"); // Prints to the console
-	// if (fgets(buf, 20, stdin)==NULL) fprintf(stderr, "Invalid Input!\n");
-	// if (isdigit(*buf)){
-	// 	printf("%s\n", "It is a digit!");
-	// 	int in = 0;
-	// 	for (int i = 0; buf[i]!='\n'&&buf[i]!=' '; i++){
-	// 		in = 10*in + buf[i]-'0';
-	// 	}
-	// 	printf("%d\n", in);
-	// }
-	// for (int i=0; buf[i]!='\0'; ++i){
-	// 	switch (buf[i]){
-	// 		case 'X': printf("%s\n", "aaa"); break;
-	// 	}
-	// }
-	
+	char buf[20];
 
+	printf("%s", "Enter Roman Numerals or Arabic Numbers!\n"); // Prints to the console
+	if (fgets(buf, 20, stdin)==NULL) fprintf(stderr, "Invalid Input!\n");
+	if (isdigit(*buf)){
+		printf("%s\n", "It is an Arabic Number");
+	}
+	int a = 0; 
+	for (int i=0; buf[i]!='\n'; ++i){
+		a=10*a+buf[i]-'0';
+	}
+	toRoman(a);
+	
 	return 0;
 }
