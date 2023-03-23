@@ -59,6 +59,15 @@ void toRoman(int arabic){
 }
 
 void toArabic(char * roman, int len){
+	int fault = 0;
+	char nrChar [10]; 
+	int nrCounter=0;
+	for (int i = 0; i < len; i++){ // make all lower case to upper case. Note a=97, A=65.
+		if (roman[i]>90) roman[i]=roman[i]-32;
+	}
+	for (int i = 0; i < 10; i++){
+		nrChar[i]='\0';
+	}
 	int * buf = (int*)malloc(len*sizeof(int));
 	for (int i = 0; i < len; i++){
 		int ibuf = 0;
@@ -70,6 +79,10 @@ void toArabic(char * roman, int len){
 			case 'X': ibuf=10; break;
 			case 'V': ibuf=5; break;
 			case 'I': ibuf=1; break;
+			default:
+				nrChar[nrCounter]=roman[i];
+				nrCounter++;
+				fault = 4;
 		}
 		buf[i]=ibuf;
 	}
@@ -80,21 +93,35 @@ void toArabic(char * roman, int len){
 		if (buf[i]<buf[i+1]){
 			if (i<len-1){
 				if (buf[i]<buf[i+2]) 
-				printf("%s\n", "Possible flawed Roman Numeral.");
+				fault=1;
 			}
 			if (buf[i]*10<buf[i+1]) {
-				printf("%s\n", "Possible flawed Roman Numeral.");
+				fault=1;
 			}
 			buf[i]=-buf[i];
 		}
 	}
 
+
+	if (sum>3999) fault = 3;
+	if (fault){
+		printf("%s\n", "Possible flawed Roman Numeral.");
+		switch (fault){
+			case 2: break;
+			case 3: printf("%s\n", "The greatest Roman Numeral is 3999, numbers greater than which are represented by multiplication by the Romans."); break;
+			case 4:
+				printf("%s \n", "Non-Recognised Character:");
+				for (int i = 0; i <nrCounter ; i++){
+					printf("%c ", nrChar[i]);
+				}
+				printf("\n");
+			
+		}
+	}
 	for (int i = 0; i < len; i++)
 		sum+=buf[i];
-
-	free(buf);
-	if (sum>3999) printf("%s\n", "The greatest Roman Numeral is 3999, numbers greater than which are represented by multiplication by the Romans.");
 	printf("%s %d\n", "The deduced Arabic representation is:", sum);
+	free(buf);
 	return;
 }
 
