@@ -1,9 +1,9 @@
 #include <stdio.h>
-#include <math.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdlib.h>
-#include <unistd.h>
+#include <math.h> // require compilation with -lm flag. For pow()
+#include <string.h> //for strcat()
+#include <ctype.h> // for isdigit()
+#include <stdlib.h> // for malloc() and free()
+// #include <unistd.h>
 
 
 void toRoman(int arabic){
@@ -59,6 +59,42 @@ void toRoman(int arabic){
 }
 
 void toArabic(char * roman, int len){
+	int * buf = (int*)malloc(len*sizeof(int));
+	for (int i = 0; i < len; i++){
+		int ibuf = 0;
+		switch (roman[i]){
+			case 'M': ibuf=1000; break;
+			case 'D': ibuf=500; break;
+			case 'C': ibuf=100; break;
+			case 'L': ibuf=50; break;
+			case 'X': ibuf=10; break;
+			case 'V': ibuf=5; break;
+			case 'I': ibuf=1; break;
+		}
+		buf[i]=ibuf;
+	}
+
+	int sum=0;
+
+	for (int i = 0; i < len-1; i++){
+		if (buf[i]<buf[i+1]){
+			if (i<len-1){
+				if (buf[i]<buf[i+2]) 
+				printf("%s\n", "Possible flawed Roman Numeral.");
+			}
+			if (buf[i]*10<buf[i+1]) {
+				printf("%s\n", "Possible flawed Roman Numeral.");
+			}
+			buf[i]=-buf[i];
+		}
+	}
+
+	for (int i = 0; i < len; i++)
+		sum+=buf[i];
+
+	free(buf);
+	if (sum>3999) printf("%s\n", "The greatest Roman Numeral is 3999, numbers greater than which are represented by multiplication by the Romans.");
+	printf("%s %d\n", "The deduced Arabic representation is:", sum);
 	return;
 }
 
@@ -87,10 +123,7 @@ int main() {//int argc, char *argv[]
 	
 	int len=0;
 	for (; buf[len]!='\n'; len++);
-	printf("%d\n", len);
 	toArabic(buf, len);
-
-	
 
 	return 0;
 }
