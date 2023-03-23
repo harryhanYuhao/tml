@@ -70,7 +70,7 @@ void test(){
 }
 
 int main() {//int argc, char *argv[]
-	test();
+	// test();
 	char buf[20];
 
 	printf("%s", "Enter Roman Numerals or Arabic Numbers!\n"); // Prints to the console
@@ -82,7 +82,15 @@ int main() {//int argc, char *argv[]
 			a=10*a+buf[i]-'0';
 		}
 		toRoman(a);
+		return 0;
 	}
 	
+	int len=0;
+	for (; buf[len]!='\n'; len++);
+	printf("%d\n", len);
+	toArabic(buf, len);
+
+	
+
 	return 0;
 }
