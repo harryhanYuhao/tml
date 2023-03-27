@@ -2,13 +2,21 @@
 #include "tEngin.h"
 #include <stdlib.h>
 
+void init();
+
 int disjoin(){
 	static int counter = 0;
 	// if (counter++>0) return 0;
 	return 1;
 }
 
+void init(){
+	teSetFPM(20);
+	return;
+}
 int main() {//int argc, char *argv[]
+	
+	init();
 	int width = 4, height = 4;
 	
 	int * array = (int*)malloc(width*height*sizeof(int));
@@ -29,3 +37,4 @@ int main() {//int argc, char *argv[]
 	teRender(array, width, height, &disjoin);
 	return 0;
 }
+
