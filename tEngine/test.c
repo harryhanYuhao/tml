@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "tEngin.h"
+#include "tEngine.c"
 #include <stdlib.h>
 
 void init();
@@ -12,10 +12,11 @@ int disjoin(){
 
 void init(){
 	teSetFPM(20);
+	teClearScreen(0);
 	return;
 }
 int main() {//int argc, char *argv[]
-	
+
 	init();
 	int width = 4, height = 4;
 	
@@ -27,12 +28,12 @@ int main() {//int argc, char *argv[]
 		}
 	}
 
-	for (int i = 0; i < height; i++){
-		for (int j = 0; j < width; j++){
-			printf("%d", array[j+width*i]);
-		}
-		puts("\n");
-	}
+	// for (int i = 0; i < height; i++){
+	// 	for (int j = 0; j < width; j++){
+	// 		printf("%d", array[j+width*i]);
+	// 	}
+	// 	puts("\n");
+	// }
 	
 	teRender(array, width, height, &disjoin);
 	return 0;
