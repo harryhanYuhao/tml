@@ -21,10 +21,12 @@ int main() {//int argc, char *argv[]
 	int width = 4, height = 4;
 	
 	int * array = (int*)malloc(width*height*sizeof(int));
+	int * color = (int*)malloc(width*height*sizeof(int));
 	
 	for (int i = 0; i < height; i++){
 		for (int j = 0; j < width; j++){
-			array[j+width*i]=i;
+			array[j+width*i]=33;
+			color[j+width*i]=0;
 		}
 	}
 
@@ -35,7 +37,7 @@ int main() {//int argc, char *argv[]
 	// 	puts("\n");
 	// }
 	
-	teRender(array, width, height, &disjoin);
+	teRender(array, color, width, height, &disjoin);
 	return 0;
 }
 
