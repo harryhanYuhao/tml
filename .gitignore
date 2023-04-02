@@ -1,5 +1,7 @@
-**a.out
-**ipynb*
+*.out
+*.o
+*.so
+*ipynb*
 # sb stands for sandbox
-**sb** 
-**sandbox**
+*sb* 
+*sandbox*

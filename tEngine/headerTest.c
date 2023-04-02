@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "tEngine.c"
+#include "tEngine.h"
 #include <stdlib.h>
 
 void init();
@@ -11,7 +11,7 @@ int disjoin(){
 }
 
 void init(){
-	teSetFPM(20);
+	teSetFPM(40);
 	teSetClearScreen(1);
 	teSetClearScreen(0);
 	return;
