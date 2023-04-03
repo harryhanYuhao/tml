@@ -1,9 +1,9 @@
 CC = gcc
-CFLAGS = -std=gnu17 -pedantic -Wall -Wextra -I/home/hhyh/psu/lib/c
+CFLAGS = -std=gnu17 -pedantic -Wall -Wextra -I$(HOME)/psu/lib/c
 DIR := $(shell pwd)
 
-headerTest: headerTest.o libtEngine.so
-	$(CC) $(CFLAGS)  headerTest.c -L$(DIR) -ltEngine 
+test: test.o libtEngine.so
+	$(CC) test.c $(CFLAGS) -L$(DIR) -ltEngine 
 	. ./LDPath.sh
 
 libtEngine.so: tEngine.o
@@ -12,8 +12,8 @@ libtEngine.so: tEngine.o
 tEngine.o: tEngine.c
 	$(CC) $(CFLAGS)  -c -fPIC tEngine.c
 
-headerTest.o: headerTest.c
-	$(CC) $(CFLAGS) -c headerTest.c
+test.o: test.c
+	$(CC) $(CFLAGS) -c test.c
 
 clean: 
-	rm *.o *.so *.out
+	rm *.o *.out

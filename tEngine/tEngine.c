@@ -17,16 +17,17 @@ static const char * toSymbol(int, int);
 static float te_fpm = 10;
 static int te_boarder_status = 1;
 static char te_boarder_symbol = '#';
-static int te_clear_screen_status = 0;
+static int te_clear_screen_status = 1;
 static const char * te_color_escpae [10] = 
 	{
+		"\0",
 		"\x1b[31m",
 		"\x1b[32m", 
 		"\x1b[33m", 
 		"\x1b[34m", 
 		"\x1b[35m", 
 		"\x1b[36m",
-		"\0","\0","\0",
+		"\0","\0",
 		"\x1b[100m",
 };
 
@@ -42,10 +43,12 @@ void teRender(int *, int *, int, int, int ());
 void teRender(int * ptr, int * cptr, int width, int heigth, int fun()){
 	long now, pre;
 	mTime(&now); mTime(&pre);
-	while (fun()){ // main loop
+	while (1){ // main loop
 		mTime(&now); 
 		while ((now-pre)>=(1000000000.0f/te_fpm)){
-			if (te_clear_screen_status) printf("\033[2J"); // Clear Screen
+			if (!fun()) goto exit;
+			printf("\n");
+			if (te_clear_screen_status) printf("\x1b[2J"); // Clear Screen
 			printf("FPS: %4.2lf\n", 1000000000.0f/((float)(now-pre))); // FPS
 
 			te_print_boarder(width+2); printf("\n"); // Boarder
@@ -67,6 +70,7 @@ void teRender(int * ptr, int * cptr, int width, int heigth, int fun()){
 		}
 		usleep(1); // Deprecated: needs to be substituded Sleeps for microseconds
 	}
+exit:
 	return;
 }
 

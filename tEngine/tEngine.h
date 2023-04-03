@@ -1,3 +1,4 @@
+void teInit();
 void teSetFPM(int);
 void teSetBoarder(int);
 void teSetClearScreen(int);
