@@ -11,7 +11,7 @@ int fun();
 
 const float PI = 3.1415926;
 const int NUM = 230; 
-const int ITER = 15;
+const int ITER = 17;
 int * screenBuffer, * colorBuffer;
 float * depthArray;
 
