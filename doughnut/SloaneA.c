@@ -27,7 +27,7 @@ int main(){
 	char b[ 1760];
 	printf("\x1b[2J");
 	for(;;){
-		if ((now-pre)>15000000){
+		if ((now-pre)>20000000){
 			memset(b,32,1760);
 			memset(z,0,7040);
 			for(j=0;6.28>j;j+=0.07){

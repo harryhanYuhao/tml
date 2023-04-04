@@ -3,15 +3,17 @@
 #include <stdlib.h>
 #include "tEngine.h" 
 
-#define WDT 70
-#define HET 30
+#define WDT 68
+#define HET 29
 
 void init();
 int fun();
 
 const float PI = 3.1415926;
-const int NUM = 400; 
+const int NUM = 230; 
+const int ITER = 15;
 int * screenBuffer, * colorBuffer;
+float * depthArray;
 
 typedef struct {
 	float x, y, z;
@@ -62,28 +64,41 @@ pt* new_pt(float x, float y, float z){ // needs to be freed
 	return res;
 }
 
+pt* copy_pt(pt * in){ // needs to be freed
+	pt* res = malloc(sizeof(pt));
+	res->x =in-> x;
+	res->y =in-> y;
+	res->z =in-> z;
+	return res;
+}
+
 void printpt(pt * ptin){
 	printf("x: %f; y: %f; z: %f\n", ptin->x, ptin->y, ptin->z);
 	return;
 }
 
 void project(pt * point, int * x, int * y){
-	*x=((int)((point->x)*(WDT/2))+WDT/2)%WDT;
-	*y=((int)((point->y)*(HET/2))+HET/2)%HET;
+	pt * copy = copy_pt(point);
+	float temp = tan(PI/4);
+	copy->z=-copy->z;
+	copy->z +=1.45;
+
+	cFMatrix3* proj = new_cFMatrix3(
+			1.0f/(temp*copy->z), 0.0f, 0.0f,
+			0.0f,1.0f/(temp*copy->z), 0.0f,
+			0.0f, 0.0f, 1.0f
+	);
+
+	v3TimesM3(copy, proj);
+
+	*x=((int)((copy->x)*(WDT/2))+WDT/2)%WDT;
+	*y=((int)((copy->y)*(HET/2))+HET/2)%HET;
+	// printf("x: %d, y: %d\n", *x, *y);
 	return;
 }
 
 int main() {//int argc, char *argv[]
 	init();
-	for (int i = 0; i < NUM/2; i++){
-		ptArray[i] = new_pt(0.85*cos(i*4*PI/NUM), 0.85*sin(i*4*PI/NUM), 0);
-		// printpt(ptArray[i]);
-	}
-
-	for (int i = NUM/2; i < NUM; i++){
-		ptArray[i] = new_pt(0.8*cos(i*4*PI/NUM), 0.8*sin(i*4*PI/NUM), 0);
-		// printpt(ptArray[i]);
-	}
 	teRender(screenBuffer, colorBuffer, WDT, HET, fun);
 	return 0;
 }
@@ -103,23 +118,49 @@ int fun() {
 			0.0f, sin(delta), cos(delta)
 	);
 
-	for (int i = 0; i < NUM; i++){
+	cFMatrix3* roty = new_cFMatrix3(
+			cos(1.25*delta),0.0f, sin(1.25*delta), 
+			0.0f, 1.0f, 0.0f,
+			-sin(1.25*delta),0.0f, cos(1.25*delta)
+	);
+
+	cFMatrix3* rotz = new_cFMatrix3(
+			 cos(1.3*delta), -sin(1.3*delta), 0.0f,
+			 sin(1.3*delta), cos(1.3*delta),   0.0f,
+			0.0f, 0.0f, 1.0f
+	);
+
+	for (int i = 0; i < ITER*NUM; i++){
+		if (ptArray[i]==NULL) continue;
 		v3TimesM3(ptArray[i], rotx);
+		v3TimesM3(ptArray[i], roty);
+		v3TimesM3(ptArray[i], rotz);
 	}
 
 	// for (int i = 0; i < NUM; i++){
 	// 	(ptArray[i]->x)+=0.01;
 	// 	(ptArray[i]->y)+=0.01;
 	// }
+	
+	for (int i = 0; i < WDT*HET; i++){
+		depthArray[i]=-10.0f;
+	}
 
-	for (int i = 0; i < NUM; i++){
+	for (int i = 0; i < ITER*NUM; i++){
+		// printpt(ptArray[i]);
+		if (ptArray[i]==NULL) continue;
 		int x, y;
 		project(ptArray[i], &x,&y); 
-		// printf("%d, %d\n", x, y);
-		if (ptArray[i]->z>0){
-			screenBuffer[x+WDT*y]=(int)'@';
-		} else{
-			screenBuffer[x+WDT*y]=(int)'.';
+		// printf("%d, %d, %f\n", x, y, ptArray[i]->z);
+		if ((depthArray[x+WDT*y])<=(ptArray[i]->z)){
+			depthArray[x+WDT*y] = ptArray[i]->z;
+			if (ptArray[i]->z>0.7)	screenBuffer[x+WDT*y]=(int)'@';
+				else if (ptArray[i]->z>0.5) screenBuffer[x+WDT*y]=(int)'#';
+				else if (ptArray[i]->z>0.3) screenBuffer[x+WDT*y]=(int)'$';
+				else if (ptArray[i]->z>0.1) screenBuffer[x+WDT*y]=(int)'!';
+				else if (ptArray[i]->z>-0.3) screenBuffer[x+WDT*y]=(int)'~';
+				else if (ptArray[i]->z>-0.5) screenBuffer[x+WDT*y]=(int)':';
+				else screenBuffer[x+WDT*y]=(int)'.';
 		}
 	}
 	// if (counter > 1) return 0;
@@ -129,12 +170,36 @@ int fun() {
 
 void init(){
 	teSetFPM(15);
-	teSetBoarder(1);
+	teSetBoarder(0);
 	teSetClearScreen(0);
 
 	screenBuffer = (int*)calloc(WDT*HET, sizeof(int));
 	colorBuffer = (int*)calloc(WDT*HET, sizeof(int));
-	ptArray = (pt **)calloc(NUM, sizeof(pt*)); 
+	ptArray = (pt **)calloc(ITER*NUM, sizeof(pt*)); 
+	depthArray = (float*)calloc(WDT*HET, sizeof(float));
+
+	float del = 0.02;
+	int bd = 6;
+	for (int i = 0; i < NUM; i++){
+		for(int j=0;j<bd; ++j){
+			ptArray[NUM*j+i]   = new_pt((0.9-del*j)*cos(i*2*PI/NUM), (0.9-del*j)*sin(i*2*PI/NUM), 0);
+		}
+		ptArray[bd*NUM+i] = new_pt((0.9-del) *cos(i*2*PI/NUM), (0.9-del) *sin(i*2*PI/NUM), -0.03);
+		ptArray[(bd+1)*NUM+i] = new_pt((0.9-del) *cos(i*2*PI/NUM), (0.9-del) *sin(i*2*PI/NUM), 0.03);
+
+		ptArray[(bd+2)*NUM+i] = new_pt((0.9-2*del) *cos(i*2*PI/NUM), (0.9-2*del) *sin(i*2*PI/NUM), -0.03);
+		ptArray[(bd+3)*NUM+i] = new_pt((0.9-2*del) *cos(i*2*PI/NUM), (0.9-2*del) *sin(i*2*PI/NUM), 0.03);
+		ptArray[(bd+4)*NUM+i] = new_pt((0.9-2*del) *cos(i*2*PI/NUM), (0.9-2*del) *sin(i*2*PI/NUM), -0.06);
+		ptArray[(bd+5)*NUM+i] = new_pt((0.9-2*del) *cos(i*2*PI/NUM), (0.9-2*del) *sin(i*2*PI/NUM), 0.06);
+
+		ptArray[(bd+6)*NUM+i] = new_pt((0.9-3*del) *cos(i*2*PI/NUM), (0.9-3*del) *sin(i*2*PI/NUM), -0.03);
+		ptArray[(bd+7)*NUM+i] = new_pt((0.9-3*del) *cos(i*2*PI/NUM), (0.9-3*del) *sin(i*2*PI/NUM), 0.03);
+		ptArray[(bd+8)*NUM+i] = new_pt((0.9-3*del) *cos(i*2*PI/NUM), (0.9-3*del) *sin(i*2*PI/NUM), -0.06);
+		ptArray[(bd+9)*NUM+i] = new_pt((0.9-3*del) *cos(i*2*PI/NUM), (0.9-3*del) *sin(i*2*PI/NUM), 0.06);
+
+		ptArray[(bd+10)*NUM+i] = new_pt((0.9-4*del) *cos(i*2*PI/NUM), (0.9-4*del) *sin(i*2*PI/NUM), -0.03);
+		ptArray[(bd+11)*NUM+i] = new_pt((0.9-4*del) *cos(i*2*PI/NUM), (0.9-4*del) *sin(i*2*PI/NUM), 0.03);
+	}
 
 	return;
 }
