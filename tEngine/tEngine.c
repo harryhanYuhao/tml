@@ -7,14 +7,14 @@
 #include "mTime.h"
 
 
-static float te_fpm;
+static float te_fps;
 static int te_boarder_status;
 static char te_boarder_symbol;
 static int te_clear_screen_status;
 static void te_print_boarder(int);
 static const char * toSymbol(int, int);
 
-static float te_fpm = 10;
+static float te_fps = 10;
 static int te_boarder_status = 1;
 static char te_boarder_symbol = '#';
 static int te_clear_screen_status = 1;
@@ -32,7 +32,7 @@ static const char * te_color_escpae [10] =
 };
 
 
-void teSetFpm(int);
+void teSetFPS(int);
 void teSetBoarder(int);
 void teSetClearScreen(int);
 void teRender(int *, int *, int, int, int ());
@@ -46,7 +46,7 @@ void teRender(int * ptr, int * cptr, int width, int heigth, int fun()){
 	now += 1000000000;
 	while (1){ // main loop
 		mTime(&now); 
-		while ((now-pre)>=(1000000000.0f/te_fpm)){
+		while ((now-pre)>=(1000000000.0f/te_fps)){ 
 			if (!fun()) goto exit;
 			printf("\n");
 			// \033c clear Screen
@@ -95,8 +95,8 @@ static void te_print_boarder(int num){
 	return;
 }
 
-void teSetFPM(int fpm){
-	te_fpm = (float)fpm;
+void teSetFPS(int fps){
+	te_fps = (float)fps;
 	return;
 }
 

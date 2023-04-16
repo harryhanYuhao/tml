@@ -114,19 +114,19 @@ int fun() {
 
 	cFMatrix3* rotx = new_cFMatrix3(
 			1.0f, 0.0f, 0.0f,
-			0.0f, cos(delta), -sin(delta), 
-			0.0f, sin(delta), cos(delta)
+			0.0f, cos(1.09*delta), -sin(1.09*delta), 
+			0.0f, sin(1.09*delta), cos(1.09*delta)
 	);
 
 	cFMatrix3* roty = new_cFMatrix3(
-			cos(1.25*delta),0.0f, sin(1.25*delta), 
+			cos(1.17*delta),0.0f, sin(1.17*delta), 
 			0.0f, 1.0f, 0.0f,
-			-sin(1.25*delta),0.0f, cos(1.25*delta)
+			-sin(1.17*delta),0.0f, cos(1.17*delta)
 	);
 
 	cFMatrix3* rotz = new_cFMatrix3(
-			 cos(1.3*delta), -sin(1.3*delta), 0.0f,
-			 sin(1.3*delta), cos(1.3*delta),   0.0f,
+			 cos(1.38*delta), -sin(1.38*delta), 0.0f,
+			 sin(1.38*delta), cos(1.38*delta),   0.0f,
 			0.0f, 0.0f, 1.0f
 	);
 
@@ -169,7 +169,7 @@ int fun() {
 }
 
 void init(){
-	teSetFPM(15);
+	teSetFPS(24);
 	teSetBoarder(0);
 	teSetClearScreen(0);
 

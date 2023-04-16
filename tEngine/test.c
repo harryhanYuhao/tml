@@ -11,7 +11,7 @@ int disjoin(){
 }
 
 void init(){
-	teSetFPM(40);
+	teSetFPS(40);
 	teSetClearScreen(1);
 	return;
 }
