@@ -58,19 +58,19 @@ void toRoman(int arabic){
 	printf("%s\n", res);
 }
 
-void toArabic(char * roman, int len){
-	int fault = 0;
-	char nrChar [10]; 
-	int nrCounter=0;
+void toArabic(char * roman, int len){  // so far it returns nothing but print the characters
+	int fault = 0;  // error & fault handling
+	char nrChar [10]; // list of unrecognised characters 
+	int nrCounter=0;  // counter for unrecognised characters
 	for (int i = 0; i < len; i++){ // make all lower case to upper case. Note a=97, A=65.
 		if (roman[i]>90) roman[i]=roman[i]-32;
 	}
 	for (int i = 0; i < 10; i++){
-		nrChar[i]='\0';
+		nrChar[i]='\0';  // list of unrecognised characters
 	}
-	int * buf = (int*)malloc(len*sizeof(int));
+	int * buf = (int*)malloc(len*sizeof(int));  // convert roman numerals into numbers and store in the array
 	for (int i = 0; i < len; i++){
-		int ibuf = 0;
+		int ibuf = 0;  // integer buffers
 		switch (roman[i]){
 			case 'M': ibuf=1000; break;
 			case 'D': ibuf=500; break;
@@ -79,7 +79,7 @@ void toArabic(char * roman, int len){
 			case 'X': ibuf=10; break;
 			case 'V': ibuf=5; break;
 			case 'I': ibuf=1; break;
-			default:
+			default:  // All other characters are fault
 				nrChar[nrCounter]=roman[i];
 				nrCounter++;
 				fault = 4;
@@ -98,12 +98,12 @@ void toArabic(char * roman, int len){
 			if (buf[i]*10<buf[i+1]) {
 				fault=1;
 			}
-			buf[i]=-buf[i];
+			buf[i]=-buf[i];  // in such case, by law of roman numeral it needs to be substracted
 		}
 	}
 
 
-	if (sum>3999) fault = 3;
+	if (sum>3999) fault = 3; // error handling needs improvements
 	if (fault){
 		printf("%s\n", "Possible flawed Roman Numeral.");
 		switch (fault){
