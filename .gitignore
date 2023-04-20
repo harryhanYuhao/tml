@@ -1,7 +1,19 @@
-*.out
-*.o
 *.so
 *ipynb*
 # sb stands for sandbox
 *sb* 
 *sandbox*
+.clang-format
+*.latexmk
+*.aux
+*.log
+*.gz
+*.toc
+*.bbl
+*.bcf
+*.xml
+*.blg
+*.fls
+*.out
+*.o
+*.txt
