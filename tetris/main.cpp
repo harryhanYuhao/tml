@@ -61,7 +61,6 @@ int expectedPieceCor [4] {0};
 bool gameState {1};
 bool newPiece {0};
 
-
 std::mutex mtx;
 
 void rotation(int * inArray){ //Rotation
@@ -256,7 +255,7 @@ void screen(){ //Update Screen according to the buffer.
 		if ((::end-::start)>=25){ //50 fps
 			puts("\033c");
 			// for (int i:gamepieceCor) std::cout<<i<<std::endl;
-			for (int i=0; i<50; i++) std::cout<<std::endl; // Updating the screen. TODO: uncomment it
+			for (int i=0; i<50; i++) std::cout<<std::endl; // Updating the screen. 
 
 			std::cout<<"e for rotation, a for left, b for right, s for down\n";
 			std::cout<<"speed: "<<400/speed<<std::endl;
