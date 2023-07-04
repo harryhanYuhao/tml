@@ -39,10 +39,6 @@ cFMatrix3 * new_cFMatrix3(float x11, float x12, float x13, float x21, float x22,
 	return res;
 }
 
-// float vec_dot(pt * a, pt * b){
-// 	return a->x+b->x+a->y+b->y+a->z+b->z;
-// }
-
 void v3TimesM3(pt * vec3, cFMatrix3 * m3){
 	float a = vec3->x;
 	float b = vec3->y;
@@ -137,11 +133,6 @@ int fun() {
 		v3TimesM3(ptArray[i], rotz);
 	}
 
-	// for (int i = 0; i < NUM; i++){
-	// 	(ptArray[i]->x)+=0.01;
-	// 	(ptArray[i]->y)+=0.01;
-	// }
-	
 	for (int i = 0; i < WDT*HET; i++){
 		depthArray[i]=-10.0f;
 	}
@@ -169,9 +160,9 @@ int fun() {
 }
 
 void init(){
-	teSetFPS(24);
+	teSetFPS(10);
 	teSetBoarder(0);
-	teSetClearScreen(0);
+	teSetClearScreen(1);
 
 	screenBuffer = (int*)calloc(WDT*HET, sizeof(int));
 	colorBuffer = (int*)calloc(WDT*HET, sizeof(int));

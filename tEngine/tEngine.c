@@ -1,5 +1,3 @@
-#ifndef _TENGIN_H
-#define _TENGIN_H	1
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -40,6 +38,10 @@ void teRender(int *, int *, int, int, int ());
 /* The Function that Passed in */
 // The first input to array ascii keys
 // The second input is array to consigning color to each inputs.
+// The arrays are two dimensional array in the form of one dimension 
+// The origin is at top left, positive x direction is right, y is down. 
+// The (a, b) coordinate will be rendered as the character
+// of ptr[a+b*width], the color of cptr[a+b*width]
 void teRender(int * ptr, int * cptr, int width, int heigth, int fun()){
 	long now, pre;
 	mTime(&now); mTime(&pre);
@@ -51,7 +53,7 @@ void teRender(int * ptr, int * cptr, int width, int heigth, int fun()){
 			printf("\n");
 			// \033c clear Screen
 			// \033[H move cursor to home position
-			if (te_clear_screen_status) printf("\033c"); // Clear Screen
+			if (te_clear_screen_status) printf("\x1b[c"); // Clear Screen
 			printf("FPS: %4.2lf\n", 1000000000.0f/((float)(now-pre))); // FPS
 
 			te_print_boarder(width+2); printf("\n"); // Boarder
@@ -77,15 +79,14 @@ exit:
 	return;
 }
 
-//strcat(s1, s2); Concatenate first string with the secound.
-
 static const char * toSymbol(int sym, int color){ 
-	char * res = (char*) calloc(50,sizeof(char));
+	char *res = (char*) calloc(50, sizeof(char));
 	char resChar [2] = {(char)sym, '\0'};
 	const char * color_string = te_color_escpae[color];
 	char * reset = "\x1b[0m";
 	
-	strcat(res, color_string); strcat(res, resChar); strcat(res, reset);
+	sprintf(res,"%s%s%s", color_string, resChar, reset);
+	//strcat(res, color_string); strcat(res, resChar); strcat(res, reset);
 	return res;
 }
 
@@ -109,5 +110,3 @@ void teSetClearScreen(int status){
 	te_clear_screen_status = status;
 	return;
 }
-
-#endif
