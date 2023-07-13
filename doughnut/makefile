@@ -6,7 +6,7 @@ CFLAGS = -std=gnu17 -pedantic -Wall -Wextra -lm -I../tEngine
 # CFLAGS = -std=gnu17 -pedantic -Wall -Wextra -lm -I../tEngine -L../tEngine -ltEngine -Wl,-rpath=../tEngine
 
 all: main.o
-	$(CC) $(CFLAGS) main.o ../tEngine/tEngine.o -o main.out
+	$(CC) $(CFLAGS) main.o ../tEngine/tEngine.o -o a.out
 
 main.o: main.c 
 	$(CC) $(CFLAGS) -c main.c 

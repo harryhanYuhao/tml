@@ -4,16 +4,21 @@
 #ifndef _MTIME_H
 #define _MTIME_H
 
-#include <time.h>
-#include <stdint.h>
-#include <inttypes.h>
+#include <sys/time.h>
 
+/// Current time in microseconds since epoch
 
-/* Current time in Nanoseconds since epoch*/
-void mTime(long * in){
-	struct timespec spec;
-	clock_gettime(CLOCK_REALTIME, &spec);
-	*in = spec.tv_sec*1000000000L + spec.tv_nsec;
-	return;
+// Complaint to C99 
+
+long int mTime(long *in){
+  long current_calendar_time = 0;
+  // timeval defined in sys/time.h
+  struct timeval tp; 
+  gettimeofday(&tp, NULL);
+  
+  current_calendar_time += tp.tv_sec*(long)(1000000) + tp.tv_usec;
+  *in = current_calendar_time;
+	return current_calendar_time;
 }
+
 #endif // endif for _MTIME_H

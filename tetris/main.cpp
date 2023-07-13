@@ -147,6 +147,8 @@ void gameloop() { // The game loop that modifies the screen buffer Updating at d
 		ctime(&(::gend));
 		if(!gameState) return;
 		if ((score-30)>0){
+      // increasing speed according to score
+      // a empirical formula
 			speedNormal=(2000/score)+1200/(score-10)+600/(score-20)+400/(score-30)+100;
 		}
 		if((::gend-::gstart)>=speed/5){ // modify here for change of game speed.

@@ -1,5 +1,13 @@
 CC = gcc 
-CFLAGS = -std=gnu17 -pedantic -Wall -Wextra -I../include
+
+CFLAGS = -std=c99 -pedantic -Wall -Wextra -I../include $(CWARNINGS) $(COPTIMISING)
+
+CWARNINGS=-Wall -Wextra -Wpedantic -Wformat=2 -Wswitch-default -Wpointer-arith -Wbad-function-cast -Wstrict-overflow=5 -Wstrict-prototypes -Winline -Wundef -Wnested-externs -Wcast-qual -Wshadow -Wunreachable-code -Wlogical-op -Wfloat-equal -Wstrict-aliasing=2 -Wredundant-decls -Wold-style-definition 
+
+COPTIMISING=-O0 -ggdb3 -fno-omit-frame-pointer -ffloat-store -fno-common -fstrict-aliasing -g
+
+# CFLAGS=-std=c11 $(CWARNINGS) $(COPTIMISING) -lm
+
 DIR := $(shell pwd)
 
 libtEngine.so: tEngine.o

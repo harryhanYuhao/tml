@@ -44,17 +44,18 @@ void teRender(int *, int *, int, int, int ());
 // of ptr[a+b*width], the color of cptr[a+b*width]
 void teRender(int * ptr, int * cptr, int width, int heigth, int fun()){
 	long now, pre;
-	mTime(&now); mTime(&pre);
+	mTime(&now);
+  mTime(&pre);
 	now += 1000000000;
 	while (1){ // main loop
 		mTime(&now); 
-		while ((now-pre)>=(1000000000.0f/te_fps)){ 
+		while ((now-pre)>=(1000000.0f/te_fps)){ 
 			if (!fun()) goto exit;
 			printf("\n");
 			// \033c clear Screen
 			// \033[H move cursor to home position
 			if (te_clear_screen_status) printf("\x1b[c"); // Clear Screen
-			printf("FPS: %4.2lf\n", 1000000000.0f/((float)(now-pre))); // FPS
+			printf("FPS: %4.2lf\n", 1000000.0f/((float)(now-pre))); // FPS
 
 			te_print_boarder(width+2); printf("\n"); // Boarder
 
