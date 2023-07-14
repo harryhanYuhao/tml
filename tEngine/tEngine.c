@@ -33,7 +33,7 @@ static const char * te_color_escpae [10] =
 void teSetFPS(int);
 void teSetBoarder(int);
 void teSetClearScreen(int);
-void teRender(int *, int *, int, int, int ());
+void teRender(int *, int *, int, int, int (void));
 
 /* The Function that Passed in */
 // The first input to array ascii keys
@@ -42,7 +42,9 @@ void teRender(int *, int *, int, int, int ());
 // The origin is at top left, positive x direction is right, y is down. 
 // The (a, b) coordinate will be rendered as the character
 // of ptr[a+b*width], the color of cptr[a+b*width]
-void teRender(int * ptr, int * cptr, int width, int heigth, int fun()){
+// width and height needs to be supplied
+// fun listed termination condition
+void teRender(int * ptr, int * cptr, int width, int heigth, int fun(void)){
 	long now, pre;
 	mTime(&now);
   mTime(&pre);
@@ -74,7 +76,7 @@ void teRender(int * ptr, int * cptr, int width, int heigth, int fun()){
 
 			pre=now; // Time tracking
 		}
-		usleep(1); // Deprecated: needs to be substituded Sleeps for microseconds
+    msleep(1);
 	}
 exit:
 	return;

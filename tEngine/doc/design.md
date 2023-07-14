@@ -15,3 +15,7 @@ tEngine is a terminal graphic engine that can be accessed with APIs like that of
 - As of now it is a static library. It should be made into a dynamic library. -- It is not made into a dylib with the corresponding header `tEngine.h`. 
 - Use `ncurses` for better 'graphics' -- May not be a necessary
 - Use a different clear screen method the retains the previous session. See spinning dougnuts
+
+## Portability
+
+The program is not compliant to C standard due to the use of the function `nanosleep()`. Nanosleep is complaint to POSIX 2008 standard.
