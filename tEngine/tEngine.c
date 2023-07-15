@@ -10,7 +10,7 @@ static int te_boarder_status;
 static char te_boarder_symbol;
 static int te_clear_screen_status;
 static void te_print_boarder(int);
-static const char * toSymbol(int, int);
+static char * toSymbol(int, int);
 
 static float te_fps = 10;
 static int te_boarder_status = 1;
@@ -19,13 +19,13 @@ static int te_clear_screen_status = 1;
 static const char * te_color_escpae [10] = 
 	{
 		"\0",
-		"\x1b[31m",
-		"\x1b[32m", 
-		"\x1b[33m", 
-		"\x1b[34m", 
-		"\x1b[35m", 
-		"\x1b[36m",
-		"\0","\0",
+		"\x1b[31m",  // red 
+		"\x1b[32m",  // green
+		"\x1b[33m",  // Yellow 
+		"\x1b[34m",  // Blue
+		"\x1b[35m",  // magenta
+		"\x1b[36m",  //  cyan
+		"\0","\0",  
 		"\x1b[100m",
 };
 
@@ -45,26 +45,26 @@ void teRender(int *, int *, int, int, int (void));
 // width and height needs to be supplied
 // fun listed termination condition
 void teRender(int * ptr, int * cptr, int width, int heigth, int fun(void)){
-	long now, pre;
-	mTime(&now);
-  mTime(&pre);
-	now += 1000000000;
+	long cur_time, pre_time;
+	mTime(&cur_time);
+  mTime(&pre_time);
+	cur_time += 1000000000;
 	while (1){ // main loop
-		mTime(&now); 
-		while ((now-pre)>=(1000000.0f/te_fps)){ 
+		mTime(&cur_time); 
+		while ((cur_time-pre_time)>=(1000000.0f/te_fps)){ 
 			if (!fun()) goto exit;
 			printf("\n");
 			// \033c clear Screen
 			// \033[H move cursor to home position
 			if (te_clear_screen_status) printf("\x1b[c"); // Clear Screen
-			printf("FPS: %4.2lf\n", 1000000.0f/((float)(now-pre))); // FPS
+			printf("FPS: %4.2lf\n", 1000000.0f/((float)(cur_time-pre_time))); // FPS
 
 			te_print_boarder(width+2); printf("\n"); // Boarder
 
 			for (int i = 0; i < heigth; i++){
 				te_print_boarder(1);
 				for (int j = 0; j < width; j++){
-					const char * bur = toSymbol(ptr[j+width*i], cptr[j+width*i]);
+					char * bur = toSymbol(ptr[j+width*i], cptr[j+width*i]);
 					printf("%s", bur);
 					free((void *)bur);
 				}
@@ -74,15 +74,15 @@ void teRender(int * ptr, int * cptr, int width, int heigth, int fun(void)){
 
 			te_print_boarder(width+2); printf("\n"); // Boarder
 
-			pre=now; // Time tracking
+			pre_time=cur_time; // Time tracking
 		}
-    msleep(1);
+    microSleep(1);
 	}
 exit:
 	return;
 }
 
-static const char * toSymbol(int sym, int color){ 
+static char * toSymbol(int sym, int color){ 
 	char *res = (char*) calloc(50, sizeof(char));
 	char resChar [2] = {(char)sym, '\0'};
 	const char * color_string = te_color_escpae[color];
@@ -96,20 +96,16 @@ static const char * toSymbol(int sym, int color){
 static void te_print_boarder(int num){
 	if (!te_boarder_status) return;
 	for (int i = 0; i < num; i++) printf("%c", te_boarder_symbol);
-	return;
 }
 
 void teSetFPS(int fps){
 	te_fps = (float)fps;
-	return;
 }
 
 void teSetBoarder(int set){
 	te_boarder_status = set;
-	return;
 }
 
 void teSetClearScreen(int status){
 	te_clear_screen_status = status;
-	return;
 }

@@ -23,15 +23,19 @@ long int mTime(long *in){
 	return current_calendar_time;
 }
 
-int msleep(long msec){
-  if (msec < 0) {
+// Input: long micro_sec
+// the current thread sleeps for micro_sec microseconds
+// if interrupted by system signals during the waiting time,
+// the remaining waiting time is simply ignored
+int microSleep(long micro_sec){
+  if (micro_sec < 0) {
     errno = EINVAL;
     return -1;
   }
 
   struct timespec ts;
-  ts.tv_sec = msec/1000;
-  ts.tv_nsec = (msec%1000) * 1000000;
+  ts.tv_sec = micro_sec/1000000;
+  ts.tv_nsec = (micro_sec%1000) * 1000;
 
   int res = nanosleep(&ts, NULL);
 
