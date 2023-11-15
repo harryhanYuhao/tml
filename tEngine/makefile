@@ -8,6 +8,8 @@ COPTIMISING=-O0 -ggdb3 -fno-omit-frame-pointer -ffloat-store -fno-common -fstric
 
 DIR := $(shell pwd)
 
+# need to set LD_LIBRARY_PATH
+
 ANSI_RED=\033[0;31m
 ANSI_BLUE=\033[0;34m
 ANSI_RESET=\033[0m 
