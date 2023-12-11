@@ -1,3 +1,4 @@
+*.swp
 *.so
 *ipynb*
 # sb stands for sandbox
