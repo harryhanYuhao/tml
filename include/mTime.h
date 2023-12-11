@@ -9,18 +9,16 @@
 #include <errno.h>
 
 /// Current time in microseconds since epoch
-
 // Complaint to C99 
-
 long int mTime(long *in){
   long current_calendar_time = 0;
   // timeval defined in sys/time.h
   struct timeval tp; 
   gettimeofday(&tp, NULL);
-  
+
   current_calendar_time += tp.tv_sec*(long)(1000000) + tp.tv_usec;
   *in = current_calendar_time;
-	return current_calendar_time;
+  return current_calendar_time;
 }
 
 // Input: long micro_sec
