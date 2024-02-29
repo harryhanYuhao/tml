@@ -27,8 +27,8 @@ double CurTime()
 int genPrompt()
 {
 	int r1, r2;
-	r1 = rand() % 100;
-	r2 = rand() % 100;
+	r1 = rand() % 1000;
+	r2 = rand() % 1000;
 	printf("%d + %d = ", r1, r2);
 	return r1 + r2;
 }
