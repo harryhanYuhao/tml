@@ -65,7 +65,7 @@ int main()
 
     printf("%d out of %d in %.3f seconds\n", correct, correct + wrong,
 			timeUsed);
-    printf("Percent Correct: %.2f\% \n",
+    printf("Percent Correct: %.2f %% \n",
            (float)(correct) / (float)(correct + wrong) * (float)100);
 	printf("%.3f ", timeUsed / (float) correct);
 	printf("sec per correct answer\n");
